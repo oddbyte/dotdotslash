@@ -8,6 +8,13 @@
 #include <dirent.h>
 #include <string.h>
 #include <sys/reboot.h>
+#include <signal.h>
+
+
+/**
+ * Some pre-processer variables here
+ * @author: oddbyte
+ */
 
 #define UPDATE_PATH "/secure/ota/update.tar"
 #define KEY_PATH "/system/update.key"
@@ -15,6 +22,19 @@
 #define ZYGOTE_PATH "/system/secbin/zygote"
 #define KERNEL_MODULES_PATH "/system/kernel"
 #define BUFFER_SIZE 4096
+
+/**
+ * Other variables:
+ * @author: oddbyte
+ */
+
+// Stuff here I guess
+
+/* 
+   --------------------------------------------------------
+   --------------------- CODE START -----------------------
+   --------------------------------------------------------
+*/
 
 /**
  * TODO: Add GPG verification to this.
@@ -60,58 +80,19 @@ void load_kernel_modules() {
 }
 
 /**
- * Allows applications that can write to the FIFO to send shutdown & reboot requests.
- * @author: oddbyte
- */
-void handle_command(const char *cmd) {
-    if (strcmp(cmd, "shutdown") == 0) {
-        sync();
-        reboot(RB_POWER_OFF);
-    } else if (strcmp(cmd, "reboot") == 0) {
-        sync();
-        reboot(RB_AUTOBOOT);
-    }
-}
-
-/**
- * Makes the FIFO file. See handle_command() for more info.
- * @author: oddbyte
- */
-void start_command_listener() {
-    mkfifo(FIFO_PATH, 0600);
-    char buffer[32];
-    
-    while (1) {
-        int fd = open(FIFO_PATH, O_RDONLY);
-        if (fd < 0) continue;
-        
-        memset(buffer, 0, sizeof(buffer));
-        read(fd, buffer, sizeof(buffer) - 1);
-        close(fd);
-        
-        handle_command(buffer);
-    }
-}
-
-/**
  * Main function from Init binary
  * @author: oddbyte
  */
 int main() {
-    if (access(UPDATE_PATH, F_OK) == 0) {
+    // Check for OTA files
+    if (access(UPDATE_PATH, 0) == 0) {
         if (verify_signature()) {
             apply_update();
         }
     }
     
-    pid_t pid = fork();
-    if (pid == 0) {
-        execl(ZYGOTE_PATH, "zygote", NULL);
-        exit(1);
-    }
-    
-    load_kernel_modules();
-    start_command_listener();
+    // Start Zygote
+    execl(ZYGOTE_PATH, "zygote", NULL);
     
     return 0;
 }
