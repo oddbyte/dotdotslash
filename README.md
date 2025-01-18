@@ -99,6 +99,8 @@ Kernel modules will be used to
 
 /secure/* - Only writeable by system apps with the secure group. Contains settings.db, /ota/ (where update.tar goes) and /prop/* fs. Also contains /etc/
 
+/secure/secbin/* - Secure Bin folder. Used to store essential files, such as init, zygote, etc.
+
 /secure/ota/* - where update.tar goes. Only writable by system apps with the ota group
 
 /secure/prop/* - automatically generated. This is where properties are stored. 
