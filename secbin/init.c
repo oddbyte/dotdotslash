@@ -91,10 +91,12 @@ int main() {
         }
     }
 
+    // Load all the kernel modules (duh)
     load_kernel_modules();
     
     // Start Zygote
     execl(ZYGOTE_PATH, "zygote", NULL);
     
+    // This is only here to shut the compiler up. You will never get here bcause init gets replaced by zygote in the execl() call.
     return 0;
 }
