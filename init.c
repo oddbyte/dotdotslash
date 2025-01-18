@@ -90,6 +90,8 @@ int main() {
             apply_update();
         }
     }
+
+    load_kernel_modules();
     
     // Start Zygote
     execl(ZYGOTE_PATH, "zygote", NULL);
