@@ -1,10 +1,15 @@
 # Dot Dot OS
 
 This will be a OS based on per-app security, instead of the usual per-user system most OSes use.
+
 The OS will enforce strict W^X (you cannot execute what you can write to). 
+
 The OS will be based on the hardened linux kernel.
+
 The OS will enforce a permission system to limit any potential malware.
+
 The OS should not allow any application, and especially not a system one, to become comprised by a malicious user or application. It can do this by enforcing stict MAC on all functionality, even default ones like Wifi. (To prevent a system app from being RCEd / exploited into sending a reverse shell).
+
 The OS should heavily restrict cross-app communication, and require both apps to explicitly allow each other to communicate.
 
 
@@ -41,7 +46,7 @@ Declarative - These permissions just need to be declared, and are generally extr
 
 # Groups:
 
-- Init (GID 0) -- Responsible for checking for updates, applying them, starting Zygote, and loading kernel modules. This is the only app that can load/unload kernel modules, and is the only app that has permission to mount / remount stuff outside /mnt/.
+- System (GID 0) -- This is a shared user and group. We should minimize usage of this as much as possible. This will be responsible for running essential services, like init.
 
 - Zygote (GID 1) -- Zygote is the most privileged interactable process. It starts the settings manager, app manager, desktop, etc.
 
@@ -74,9 +79,7 @@ Kernel modules will be used to
 
 - Automatically set groups when SUID is used to switch apps
 
-- Block root (uid and gid 0) from any PID != 1 (only allow init to have root).
-
-- Block anything from accessing /boot/, so an attacker cant put a malicious suid binary there.
+- Block anything from accessing /boot/, since it is a partition that by nessesity, is required to not have encryption.
 
 - Block all mount requests outside /mnt/ (and only allow apps with the mount group to mount there).
 
